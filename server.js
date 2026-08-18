@@ -6,6 +6,7 @@ const express = require('express')
 const session = require('express-session')
 const multer = require('multer')
 const s3 = require('./lib/s3')
+const mail = require('./lib/mail')
 
 const app = express()
 const PORT = process.env.PORT || 3000
@@ -239,19 +240,10 @@ app.post('/api/quote', async (req, res) => {
   }
 
   try {
-    if (s3.isConfigured()) {
-      await s3.saveQuote({
-        id: crypto.randomUUID(),
-        name,
-        phone,
-        email,
-        message,
-        createdAt: new Date().toISOString()
-      })
-    }
+    await mail.sendQuote({ name, phone, email, message })
     res.json({ ok: true })
   } catch (error) {
-    console.error('Quote save failed', error)
+    console.error('Quote send failed', error)
     res.status(500).json({ ok: false, error: 'Could not send that request. Call us instead.' })
   }
 })

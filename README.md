@@ -13,7 +13,7 @@ Project photos are stored in the `joedirtworx` S3 bucket. Anyone can view them. 
 
 Sign in at `/admin` (not linked from the public site). Use the `ADMIN_PASSWORD` config var.
 
-Uploads go to `s3://joedirtworx/projects/`. Quote requests are saved privately under `s3://joedirtworx/quotes/`.
+Uploads go to `s3://joedirtworx/projects/`. Quote requests are emailed to the contact address.
 
 ## Local setup
 

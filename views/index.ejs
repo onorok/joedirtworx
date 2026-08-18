@@ -99,10 +99,22 @@
     <form class="quote-form" id="quote-form">
       <h2>Get a Free Quote</h2>
       <p>Ready to get started? Fill out the form and we'll get back to you fast.</p>
-      <label>Name<input type="text" name="name" required></label>
-      <label>Phone<input type="tel" name="phone" required></label>
-      <label>Email<input type="email" name="email"></label>
-      <label>Tell us about your project.<textarea name="message" rows="4" required></textarea></label>
+      <div class="field">
+        <label for="quote-name">Name</label>
+        <input id="quote-name" type="text" name="name" autocomplete="name" required>
+      </div>
+      <div class="field">
+        <label for="quote-phone">Phone</label>
+        <input id="quote-phone" type="tel" name="phone" autocomplete="tel" required>
+      </div>
+      <div class="field">
+        <label for="quote-email">Email</label>
+        <input id="quote-email" type="email" name="email" autocomplete="email">
+      </div>
+      <div class="field">
+        <label for="quote-message">Tell us about your project.</label>
+        <textarea id="quote-message" name="message" rows="4" required></textarea>
+      </div>
       <button class="btn btn-black" type="submit">Send Request</button>
       <p class="form-status" hidden></p>
     </form>
