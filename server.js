@@ -29,6 +29,26 @@ app.set('view engine', 'ejs')
 app.set('views', path.join(__dirname, 'views'))
 app.set('trust proxy', 1)
 
+app.use((req, res, next) => {
+  const hosted = process.env.NODE_ENV === 'production' || Boolean(process.env.DYNO)
+  if (!hosted) {
+    next()
+    return
+  }
+
+  const host = String(req.hostname || '').toLowerCase()
+  const pathAndQuery = req.originalUrl || '/'
+  const canonicalHost = host === 'www.joedirtworx.com' ? 'joedirtworx.com' : host
+
+  if (!req.secure || host !== canonicalHost) {
+    res.redirect(301, `https://${canonicalHost}${pathAndQuery}`)
+    return
+  }
+
+  res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains')
+  next()
+})
+
 app.use(express.static(path.join(__dirname, 'public')))
 app.use(express.urlencoded({ extended: true }))
 app.use(express.json())
