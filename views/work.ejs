@@ -1,0 +1,38 @@
+<%- include('partials/header', { title: 'Our Work | Joe Dirt Worx' }) %>
+
+<section class="page-hero">
+  <div class="wrap">
+    <p class="eyebrow">Joe Dirt Worx</p>
+    <h1>Our Work</h1>
+    <p>Land clearing, ponds, driveways, and site prep across the River Valley.</p>
+  </div>
+</section>
+
+<section class="work-page">
+  <div class="wrap">
+    <% if (projects.length) { %>
+      <% projects.forEach((project) => { %>
+        <article class="work-project" id="<%= project.id %>">
+          <div class="work-copy">
+            <h2><%= project.title %></h2>
+            <% if (project.description) { %>
+              <p><%= project.description %></p>
+            <% } %>
+          </div>
+          <div class="project-grid">
+            <% project.images.forEach((image) => { %>
+              <figure class="project-card">
+                <img src="<%= image.url %>" alt="<%= project.title %>">
+                <span><%= project.title %></span>
+              </figure>
+            <% }) %>
+          </div>
+        </article>
+      <% }) %>
+    <% } else { %>
+      <p class="empty">No projects uploaded yet. Check back soon or call <%= phone %>.</p>
+    <% } %>
+  </div>
+</section>
+
+<%- include('partials/footer') %>

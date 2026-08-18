@@ -1,0 +1,52 @@
+<%- include('../partials/header', { title: 'Projects Admin | Joe Dirt Worx' }) %>
+
+<section class="admin-page">
+  <div class="admin-toolbar wrap">
+    <div>
+      <p class="eyebrow">Admin</p>
+      <h1>Project photos</h1>
+    </div>
+    <form method="post" action="/admin/logout">
+      <button class="btn btn-ghost" type="submit">Sign out</button>
+    </form>
+  </div>
+
+  <div class="wrap admin-layout">
+    <form class="admin-card" method="post" action="/admin/projects" enctype="multipart/form-data">
+      <h2>Add a project</h2>
+      <% if (!s3Ready) { %>
+        <p class="flash flash-error">S3 is not configured. Uploads will not save.</p>
+      <% } %>
+      <% if (error) { %>
+        <p class="flash flash-error"><%= error %></p>
+      <% } %>
+      <% if (notice) { %>
+        <p class="flash flash-ok"><%= notice %></p>
+      <% } %>
+      <label>Project title<input type="text" name="title" placeholder="Pond excavation" required></label>
+      <label>Short description <span>(optional)</span><textarea name="description" rows="3"></textarea></label>
+      <label>Photos<input type="file" name="photos" accept="image/*" multiple required></label>
+      <button class="btn btn-orange" type="submit">Upload project</button>
+    </form>
+
+    <div class="admin-list">
+      <% if (!projects.length) { %>
+        <p class="empty">No projects yet. Upload the first one.</p>
+      <% } %>
+      <% projects.forEach((project) => { %>
+        <article class="admin-project">
+          <img src="<%= project.images[0] && project.images[0].url %>" alt="">
+          <div>
+            <h3><%= project.title %></h3>
+            <p><%= project.images.length %> photo<%= project.images.length === 1 ? '' : 's' %></p>
+          </div>
+          <form method="post" action="/admin/projects/<%= encodeURIComponent(project.id) %>/delete" onsubmit="return confirm('Delete this project?')">
+            <button class="btn btn-ghost" type="submit">Delete</button>
+          </form>
+        </article>
+      <% }) %>
+    </div>
+  </div>
+</section>
+
+<%- include('../partials/footer') %>
