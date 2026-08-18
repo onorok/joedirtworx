@@ -6,13 +6,16 @@
       <p class="eyebrow">Admin</p>
       <h1>Project photos</h1>
     </div>
-    <form method="post" action="/admin/logout">
-      <button class="btn btn-ghost" type="submit">Sign out</button>
-    </form>
+    <div class="admin-toolbar-actions">
+      <a class="btn btn-ghost" href="/work">View Our Work</a>
+      <form method="post" action="/admin/logout">
+        <button class="btn btn-ghost" type="submit">Sign out</button>
+      </form>
+    </div>
   </div>
 
   <div class="wrap admin-layout">
-    <form class="admin-card" method="post" action="/admin/projects" enctype="multipart/form-data">
+    <form id="project-upload-form" class="admin-card" method="post" action="/admin/projects" enctype="multipart/form-data">
       <h2>Add a project</h2>
       <% if (!s3Ready) { %>
         <p class="flash flash-error">S3 is not configured. Uploads will not save.</p>
@@ -25,8 +28,21 @@
       <% } %>
       <label>Project title<input type="text" name="title" placeholder="Pond excavation" required></label>
       <label>Short description <span>(optional)</span><textarea name="description" rows="3"></textarea></label>
-      <label>Photos<input type="file" name="photos" accept="image/*" multiple required></label>
+      <label>Photos
+        <input type="file" name="photos" accept="image/*" multiple required>
+        <small class="file-hint" data-file-hint></small>
+      </label>
       <button class="btn btn-orange" type="submit">Upload project</button>
+      <div class="upload-status" hidden>
+        <div class="upload-spinner" aria-hidden="true"></div>
+        <div class="upload-status-copy">
+          <p class="upload-status-label">Uploading photos…</p>
+          <p class="upload-status-pct">0%</p>
+        </div>
+        <div class="upload-progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+          <span></span>
+        </div>
+      </div>
     </form>
 
     <div class="admin-list">
@@ -40,7 +56,12 @@
             <h3><%= project.title %></h3>
             <p><%= project.images.length %> photo<%= project.images.length === 1 ? '' : 's' %></p>
           </div>
-          <form method="post" action="/admin/projects/<%= encodeURIComponent(project.id) %>/delete" onsubmit="return confirm('Delete this project?')">
+          <form
+            class="delete-project-form"
+            method="post"
+            action="/admin/projects/<%= encodeURIComponent(project.id) %>/delete"
+            data-title="<%= project.title %>"
+          >
             <button class="btn btn-ghost" type="submit">Delete</button>
           </form>
         </article>
@@ -48,5 +69,14 @@
     </div>
   </div>
 </section>
+
+<dialog class="confirm-modal" id="confirm-delete" aria-labelledby="confirm-delete-title">
+  <h2 id="confirm-delete-title">Delete this project?</h2>
+  <p>This will permanently remove <strong data-project-title></strong> and its photos.</p>
+  <div class="confirm-modal-actions">
+    <button class="btn btn-ghost" type="button" data-cancel>Cancel</button>
+    <button class="btn btn-danger" type="button" data-confirm>Delete project</button>
+  </div>
+</dialog>
 
 <%- include('../partials/footer') %>

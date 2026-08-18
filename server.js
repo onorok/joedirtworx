@@ -163,6 +163,29 @@ app.get('/admin/projects', requireAdmin, async (req, res, next) => {
   }
 })
 
+function wantsJson(req) {
+  return String(req.get('Accept') || '').includes('application/json')
+}
+
+function adminUploadResponse(req, res, { error, notice }) {
+  if (error) {
+    req.session.adminError = error
+    if (wantsJson(req)) {
+      res.status(400).json({ ok: false, error })
+      return
+    }
+    res.redirect('/admin/projects')
+    return
+  }
+
+  req.session.adminNotice = notice
+  if (wantsJson(req)) {
+    res.json({ ok: true })
+    return
+  }
+  res.redirect('/admin/projects')
+}
+
 app.post('/admin/projects', requireAdmin, upload.array('photos', 12), async (req, res) => {
   try {
     if (!s3.isConfigured()) {
@@ -199,11 +222,9 @@ app.post('/admin/projects', requireAdmin, upload.array('photos', 12), async (req
     })
     await s3.writeManifest(manifest)
 
-    req.session.adminNotice = 'Project added.'
-    res.redirect('/admin/projects')
+    adminUploadResponse(req, res, { notice: 'Project added.' })
   } catch (error) {
-    req.session.adminError = error.message || 'Could not save that project.'
-    res.redirect('/admin/projects')
+    adminUploadResponse(req, res, { error: error.message || 'Could not save that project.' })
   }
 })
 
@@ -251,15 +272,13 @@ app.post('/api/quote', async (req, res) => {
 app.use((error, req, res, next) => {
   if (error instanceof multer.MulterError) {
     if (req.path.startsWith('/admin')) {
-      req.session.adminError = 'That upload is too large. Use images under 12MB.'
-      res.redirect('/admin/projects')
+      adminUploadResponse(req, res, { error: 'That upload is too large. Use images under 12MB.' })
       return
     }
   }
 
   if (req.path.startsWith('/admin') && error.message?.includes('upload')) {
-    req.session.adminError = error.message
-    res.redirect('/admin/projects')
+    adminUploadResponse(req, res, { error: error.message })
     return
   }
 

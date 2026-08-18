@@ -1,14 +1,17 @@
 <%- include('../partials/header', { title: 'Admin | Joe Dirt Worx' }) %>
 
-<section class="admin-page">
-  <form class="admin-card" method="post" action="/admin/login">
+<section class="admin-page admin-login-page">
+  <form class="admin-card admin-login-card" method="post" action="/admin/login">
     <p class="eyebrow">Admin</p>
     <h1>Sign in</h1>
-    <p>This page is not linked from the public site. Use it to add project photos.</p>
+    <p>Upload project photos and details for the Our Work page.</p>
     <% if (error) { %>
       <p class="flash flash-error"><%= error %></p>
     <% } %>
-    <label>Password<input type="password" name="password" required autofocus></label>
+    <div class="field">
+      <label for="admin-password">Password</label>
+      <input id="admin-password" type="password" name="password" autocomplete="current-password" required autofocus>
+    </div>
     <button class="btn btn-orange" type="submit">Sign In</button>
   </form>
 </section>
