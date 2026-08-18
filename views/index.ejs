@@ -1,12 +1,15 @@
 <%- include('partials/header') %>
 
-<section class="hero" style="background-image: url('/img/hero.jpg')">
+<section class="hero">
+  <div class="hero-media" aria-hidden="true">
+    <img src="/img/hero.jpg?v=2" alt="">
+  </div>
   <div class="hero-shade"></div>
   <div class="wrap hero-copy">
     <h1>Dirt Work Done Right.</h1>
     <p>Dependable land clearing and dirt work services for your property. Big or small, we get it done.</p>
     <div class="hero-actions">
-      <a class="btn btn-orange" href="<%= phoneHref %>">Call <%= phone %></a>
+      <a class="btn btn-orange" href="<%= phoneHref %>"><i class="fa-solid fa-phone" aria-hidden="true"></i> Call <%= phone %></a>
       <a class="btn btn-ghost" href="#contact">Get a Free Quote</a>
     </div>
   </div>
@@ -16,32 +19,32 @@
   <div class="wrap">
     <div class="service-grid">
       <article>
-        <svg viewBox="0 0 64 64" aria-hidden="true"><path d="M8 48h48M14 48 22 22h8l4 10h8l8 16M18 32h10M34 18c6 0 10 4 10 8"/></svg>
+        <i class="fa-solid fa-tree" aria-hidden="true"></i>
         <h2>Land Clearing</h2>
         <p>Brush, trees, stumps and overgrowth cleared.</p>
       </article>
       <article>
-        <svg viewBox="0 0 64 64" aria-hidden="true"><path d="M8 46h20l8-14h10l10 14M10 46l8-22h12l6 10M46 24h10v10"/></svg>
+        <i class="fa-solid fa-person-digging" aria-hidden="true"></i>
         <h2>Dirt Work</h2>
         <p>Excavation, fill dirt, and general dirt work.</p>
       </article>
       <article>
-        <svg viewBox="0 0 64 64" aria-hidden="true"><path d="M6 46h52M10 46 18 30h28l8 16M14 38h36M22 30V22h8"/></svg>
+        <i class="fa-solid fa-layer-group" aria-hidden="true"></i>
         <h2>Grading &amp; Leveling</h2>
         <p>Leveling, sloping, and smoothing for a solid foundation.</p>
       </article>
       <article>
-        <svg viewBox="0 0 64 64" aria-hidden="true"><path d="M6 44c10-8 18-4 26 0s16 8 26 0M10 50h44M18 44v6M46 44v6"/></svg>
+        <i class="fa-solid fa-road" aria-hidden="true"></i>
         <h2>Driveway Work</h2>
         <p>New driveways, repairs, and maintenance.</p>
       </article>
       <article>
-        <svg viewBox="0 0 64 64" aria-hidden="true"><path d="M12 50V28l20-14 20 14v22H12zm12 0V36h16v14"/></svg>
+        <i class="fa-solid fa-helmet-safety" aria-hidden="true"></i>
         <h2>Site Preparation</h2>
         <p>Build-ready land from start to finish.</p>
       </article>
       <article>
-        <svg viewBox="0 0 64 64" aria-hidden="true"><path d="M8 46h48M14 46 20 28h8l4 8 6-16 8 20 4-12h6"/></svg>
+        <i class="fa-solid fa-broom" aria-hidden="true"></i>
         <h2>Property Cleanup</h2>
         <p>Pond work, debris removal, and clean up.</p>
       </article>
@@ -78,15 +81,15 @@
       <p>We take pride in doing the job right the first time. From major land clearing to small dirt jobs, we treat every project like it's our own.</p>
       <ul class="about-points">
         <li>
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 4 7v6c0 5 3.4 8.4 8 9 4.6-.6 8-4 8-9V7z"/></svg>
+          <i class="fa-solid fa-shield-halved" aria-hidden="true"></i>
           Fully Insured
         </li>
         <li>
-          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M12 8v5l3 2"/></svg>
+          <i class="fa-solid fa-clock" aria-hidden="true"></i>
           On Time Every Time
         </li>
         <li>
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 12h8M8 9h3M8 15h3M7 6h10v12H7z"/></svg>
+          <i class="fa-solid fa-handshake" aria-hidden="true"></i>
           Local &amp; Reliable
         </li>
       </ul>

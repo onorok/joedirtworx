@@ -22,3 +22,5 @@ cp .env.example .env
 npm install
 npm run dev
 ```
+
+That starts the Express server on http://localhost:3000 and reloads when server files change.

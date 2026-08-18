@@ -1,3 +1,26 @@
+const media = document.querySelector('.hero-media')
+const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)')
+
+if (media && !reduceMotion.matches) {
+  let ticking = false
+
+  const updateParallax = () => {
+    const rect = media.parentElement.getBoundingClientRect()
+    const offset = Math.min(Math.max(-rect.top, 0), rect.height)
+    media.style.transform = `translate3d(0, ${offset * 0.35}px, 0)`
+    ticking = false
+  }
+
+  const onScroll = () => {
+    if (ticking) return
+    ticking = true
+    window.requestAnimationFrame(updateParallax)
+  }
+
+  window.addEventListener('scroll', onScroll, { passive: true })
+  updateParallax()
+}
+
 const nav = document.querySelector('.site-nav')
 const toggle = document.querySelector('.nav-toggle')
 

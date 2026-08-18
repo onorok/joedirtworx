@@ -8,19 +8,22 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Oswald:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
   <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
   <header class="site-header">
     <div class="wrap header-inner">
       <a class="brand" href="/">
-        <img src="/img/logo-mark.png" alt="" width="56" height="48">
-        <span>
-          <strong>JOE DIRT WORX</strong>
+        <img class="brand-mark" src="/img/logo-mark.png?v=2" alt="Joe Dirt Worx" width="72" height="72">
+        <span class="brand-text">
+          <strong>Joe Dirt Worx</strong>
           <em>Land Clearing & Dirt Work</em>
         </span>
       </a>
-      <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav">Menu</button>
+      <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav" aria-label="Menu">
+        <i class="fa-solid fa-bars" aria-hidden="true"></i>
+      </button>
       <nav id="site-nav" class="site-nav">
         <a href="/" class="<%= currentPath === '/' ? 'is-active' : '' %>">Home</a>
         <a href="/#services">Services</a>
@@ -30,7 +33,7 @@
         <a href="/#contact">Contact</a>
       </nav>
       <a class="btn btn-orange header-phone" href="<%= phoneHref %>">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2a1.2 1.2 0 0 1 1.2-.3 13 13 0 0 0 4.1.7 1.2 1.2 0 0 1 1.2 1.2V20a1.2 1.2 0 0 1-1.2 1.2A17.2 17.2 0 0 1 2.8 4.2 1.2 1.2 0 0 1 4 3h3.2A1.2 1.2 0 0 1 8.4 4.2a13 13 0 0 0 .7 4.1 1.2 1.2 0 0 1-.3 1.2z"/></svg>
+        <i class="fa-solid fa-phone" aria-hidden="true"></i>
         <%= phone %>
       </a>
     </div>

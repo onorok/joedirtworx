@@ -1,3 +1,5 @@
+require('dotenv').config()
+
 const crypto = require('crypto')
 const path = require('path')
 const express = require('express')
@@ -275,4 +277,5 @@ app.use((error, req, res, next) => {
 
 app.listen(PORT, () => {
   console.log(`Joe Dirt Worx listening on ${PORT}`)
+  console.log(`Open http://localhost:${PORT} in your browser`)
 })
