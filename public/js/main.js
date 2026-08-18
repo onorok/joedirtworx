@@ -110,6 +110,24 @@ if (projectForm) {
       : ''
   })
 
+  const applyEvents = (events) => {
+    let last = null
+    for (const event of events) {
+      if (event.error || event.ok === false) {
+        return event
+      }
+      last = event
+      if (event.total) {
+        const label = event.file && event.files
+          ? `Uploading photo ${event.file} of ${event.files}…`
+          : 'Uploading photos…'
+        setProgress((event.loaded / event.total) * 100, label)
+      }
+      if (event.ok) return event
+    }
+    return last
+  }
+
   projectForm.addEventListener('submit', (event) => {
     event.preventDefault()
     projectForm.classList.add('is-uploading')
@@ -119,41 +137,66 @@ if (projectForm) {
 
     const xhr = new XMLHttpRequest()
     xhr.open('POST', projectForm.action)
-    xhr.setRequestHeader('Accept', 'application/json')
+    xhr.setRequestHeader('Accept', 'application/x-ndjson')
+
+    let cursor = 0
+    let result = null
+
+    const readStream = () => {
+      const chunk = xhr.responseText.slice(cursor)
+      const lastBreak = chunk.lastIndexOf('\n')
+      if (lastBreak === -1) return
+      const lines = chunk.slice(0, lastBreak).split('\n')
+      cursor += lastBreak + 1
+      const events = lines.flatMap((line) => {
+        if (!line.trim()) return []
+        try {
+          return [JSON.parse(line)]
+        } catch {
+          return []
+        }
+      })
+      result = applyEvents(events) || result
+    }
 
     xhr.upload.addEventListener('progress', (uploadEvent) => {
-      if (!uploadEvent.lengthComputable) return
-      const pct = (uploadEvent.loaded / uploadEvent.total) * 90
-      setProgress(pct, 'Uploading photos…')
+      if (!uploadEvent.lengthComputable || result) return
+      setProgress((uploadEvent.loaded / uploadEvent.total) * 100, 'Sending photos…')
     })
 
+    xhr.addEventListener('progress', readStream)
     xhr.addEventListener('load', () => {
-      let data = {}
-      try {
-        data = JSON.parse(xhr.responseText)
-      } catch {
-        data = {}
+      readStream()
+      const leftover = xhr.responseText.slice(cursor).trim()
+      if (leftover) {
+        try {
+          result = applyEvents([JSON.parse(leftover)]) || result
+        } catch {
+          if (!result) {
+            try {
+              result = JSON.parse(xhr.responseText)
+            } catch {
+              result = {}
+            }
+          }
+        }
       }
 
-      if (xhr.status >= 200 && xhr.status < 300 && data.ok) {
-        setProgress(100, 'Saving project…')
+      if (xhr.status >= 200 && xhr.status < 300 && result && result.ok) {
+        setProgress(100, 'Project saved.')
         window.location.reload()
         return
       }
 
       projectForm.classList.remove('is-uploading')
       submit.disabled = false
-      setProgress(0, data.error || 'Upload failed. Try again.')
+      setProgress(0, (result && result.error) || 'Upload failed. Try again.')
     })
 
     xhr.addEventListener('error', () => {
       projectForm.classList.remove('is-uploading')
       submit.disabled = false
       setProgress(0, 'Upload failed. Check your connection and try again.')
-    })
-
-    xhr.upload.addEventListener('load', () => {
-      setProgress(92, 'Saving photos…')
     })
 
     xhr.send(new FormData(projectForm))
@@ -190,6 +233,15 @@ if (confirmDelete) {
 
 const form = document.querySelector('#quote-form')
 if (form) {
+  form.addEventListener('pointerdown', (event) => {
+    const field = event.target.closest('input, textarea')
+    if (!field || event.target !== field) return
+    if (event.pointerType === 'mouse' && event.button !== 0) return
+    if (document.activeElement === field) return
+    event.preventDefault()
+    field.focus({ preventScroll: true })
+  })
+
   const status = form.querySelector('.form-status')
   form.addEventListener('submit', async (event) => {
     event.preventDefault()

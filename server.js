@@ -52,6 +52,7 @@ app.use((req, res, next) => {
   res.locals.isAdmin = Boolean(req.session.admin)
   res.locals.phone = '870-688-5556'
   res.locals.phoneHref = 'tel:8706885556'
+  res.locals.siteUrl = process.env.SITE_URL || 'https://joedirtworx.com'
   next()
 })
 
@@ -164,7 +165,8 @@ app.get('/admin/projects', requireAdmin, async (req, res, next) => {
 })
 
 function wantsJson(req) {
-  return String(req.get('Accept') || '').includes('application/json')
+  const accept = String(req.get('Accept') || '')
+  return accept.includes('application/json') || accept.includes('application/x-ndjson')
 }
 
 function adminUploadResponse(req, res, { error, notice }) {
@@ -186,7 +188,26 @@ function adminUploadResponse(req, res, { error, notice }) {
   res.redirect('/admin/projects')
 }
 
+function writeProgress(res, payload) {
+  res.write(`${JSON.stringify(payload)}\n`)
+}
+
+function saveSession(req) {
+  return new Promise((resolve, reject) => {
+    req.session.save((error) => {
+      if (error) {
+        reject(error)
+        return
+      }
+      resolve()
+    })
+  })
+}
+
 app.post('/admin/projects', requireAdmin, upload.array('photos', 12), async (req, res) => {
+  const streaming = wantsJson(req)
+  let startedStream = false
+
   try {
     if (!s3.isConfigured()) {
       throw new Error('S3 is not configured on this app.')
@@ -205,11 +226,34 @@ app.post('/admin/projects', requireAdmin, upload.array('photos', 12), async (req
 
     const id = `${Date.now()}-${slugify(title)}`
     const images = []
+    const totalBytes = files.reduce((sum, file) => sum + file.buffer.length, 0)
+    let completedBytes = 0
+
+    if (streaming) {
+      res.status(200)
+      res.setHeader('Content-Type', 'application/x-ndjson')
+      res.setHeader('Cache-Control', 'no-cache, no-transform')
+      res.setHeader('X-Accel-Buffering', 'no')
+      res.flushHeaders()
+      startedStream = true
+      writeProgress(res, { file: 1, files: files.length, loaded: 0, total: totalBytes })
+    }
 
     for (const [index, file] of files.entries()) {
       const key = `projects/${id}/${String(index + 1).padStart(2, '0')}${extensionFor(file)}`
-      const url = await s3.uploadImage(key, file.buffer, file.mimetype)
+      const url = await s3.uploadImage(key, file.buffer, file.mimetype, streaming
+        ? (loaded, fileTotal) => {
+            const current = Math.min(loaded, fileTotal || file.buffer.length)
+            writeProgress(res, {
+              file: index + 1,
+              files: files.length,
+              loaded: completedBytes + current,
+              total: totalBytes
+            })
+          }
+        : undefined)
       images.push({ key, url })
+      completedBytes += file.buffer.length
     }
 
     const manifest = await s3.readManifest()
@@ -222,9 +266,25 @@ app.post('/admin/projects', requireAdmin, upload.array('photos', 12), async (req
     })
     await s3.writeManifest(manifest)
 
+    if (startedStream) {
+      req.session.adminNotice = 'Project added.'
+      await saveSession(req)
+      writeProgress(res, { ok: true, loaded: totalBytes, total: totalBytes, files: files.length })
+      res.end()
+      return
+    }
+
     adminUploadResponse(req, res, { notice: 'Project added.' })
   } catch (error) {
-    adminUploadResponse(req, res, { error: error.message || 'Could not save that project.' })
+    const message = error.message || 'Could not save that project.'
+    if (startedStream) {
+      req.session.adminError = message
+      await saveSession(req).catch(() => {})
+      writeProgress(res, { ok: false, error: message })
+      res.end()
+      return
+    }
+    adminUploadResponse(req, res, { error: message })
   }
 })
 
